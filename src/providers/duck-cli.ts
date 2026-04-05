@@ -357,6 +357,12 @@ interface RouterTarget {
  * Supports both short names and full model IDs.
  */
 function resolveModelTarget(modelName: string): { provider: string; model?: string; label: string } {
+  // Bare provider names → default models
+  if (modelName === "lmstudio") return { provider: "lmstudio", model: "gemma-4-e4b-it", label: "LM Studio: Gemma 4 e4b" };
+  if (modelName === "kimi") return { provider: "kimi", model: "moonshot-v1-8k", label: "Kimi: moonshot-v1-8k" };
+  if (modelName === "minimax") return { provider: "minimax", model: "MiniMax-M2.7", label: "MiniMax M2.7" };
+  if (modelName === "openrouter") return { provider: "openrouter", model: "openrouter/auto", label: "OpenRouter: auto" };
+
   // LM Studio models (local)
   if (modelName.includes("gemma") || modelName.includes("qwen") || modelName.includes("llama") || modelName.includes("janus")) {
     return { provider: "lmstudio", model: modelName, label: `LM Studio: ${modelName}` };
