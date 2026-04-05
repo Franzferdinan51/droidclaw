@@ -82,13 +82,14 @@ class MiniMaxProvider implements DuckCLIProvider {
           }))
         ];
 
+        const minimaxModel = (opts.model && opts.model !== "minimax") ? opts.model : "MiniMax-M2.7";
         const res = await fetch("https://api.minimax.io/v1/chat/completions", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${this.apiKey}`
           },
-          body: JSON.stringify({ model: opts.model || "MiniMax-M2.7", messages: msgs })
+          body: JSON.stringify({ model: minimaxModel, messages: msgs }),
         });
 
         if (!res.ok) {
@@ -363,7 +364,9 @@ function resolveModelTarget(modelName: string): { provider: string; model?: stri
 
   // MiniMax models
   if (modelName.toLowerCase().includes("minimax") || modelName.includes("glm-")) {
-    return { provider: "minimax", model: modelName, label: `MiniMax: ${modelName}` };
+    // Strip provider prefix: "minimax/MiniMax-M2.7" → "MiniMax-M2.7"
+    const stripped = modelName.includes("/") ? modelName.split("/")[1] : modelName;
+    return { provider: "minimax", model: stripped, label: `MiniMax: ${stripped}` };
   }
 
   // Kimi models
@@ -380,6 +383,11 @@ function resolveModelTarget(modelName: string): { provider: string; model?: stri
   if (modelName.includes(":free")) {
     return { provider: "openrouter", model: modelName, label: `OpenRouter: ${modelName}` };
   }
+
+  // Bare provider names → full model
+  if (modelName === "minimax") return { provider: "minimax", model: "MiniMax-M2.7", label: "MiniMax M2.7" };
+  if (modelName === "kimi") return { provider: "kimi", model: "moonshot-v1-8k", label: "Kimi" };
+  if (modelName === "openrouter") return { provider: "openrouter", model: "openrouter/auto", label: "OpenRouter" };
 
   // Default: try LM Studio first (free), then OpenClaw
   return { provider: "lmstudio", model: modelName, label: modelName };
