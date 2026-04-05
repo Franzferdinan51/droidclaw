@@ -80,17 +80,38 @@ export const Config = {
   OLLAMA_BASE_URL: env("OLLAMA_BASE_URL", "http://localhost:11434/v1"),
   OLLAMA_MODEL: env("OLLAMA_MODEL", DEFAULT_OLLAMA_MODEL),
 
+  // duck-cli Provider Configuration (uses duck-cli's multi-provider system)
+  // Set LLM_PROVIDER=duck-cli to use this
+  // Model selection (preferred for Android):
+  //   gemma-4-e4b-it       — Gemma 4 small (PREFERRED for Android, vision + tool-calling trained!)
+  //   kimi-k2.5            — Kimi vision + coding
+  //   google/gemma-4-26b-a4b — Gemma 4 26B (large)
+  //   qwen3.5-9b           — Fast + local vision
+  //   minimax/MiniMax-M2.7  — Fast reasoning via MiniMax
+  //   minimax/minimax-m2.5:free — OpenRouter free tier
+  DUCK_CLI_MODEL: env("DUCK_CLI_MODEL", process.env.GEMMA_MODEL || "gemma-4-e4b-it"),
+  // Override provider priority order (comma-separated):
+  //   "gemma,kimi,minimax" — local → Kimi → MiniMax
+  //   "kimi,openrouter"   — Kimi first, then OpenRouter free
+  DUCK_PRIORITY: env("DUCK_PRIORITY", ""),
+  // OpenClaw Gateway (for openclaw provider)
+  OPENCLAW_GATEWAY_URL: env("OPENCLAW_GATEWAY_URL", "http://localhost:18789"),
+  OPENCLAW_GATEWAY_TOKEN: env("OPENCLAW_GATEWAY_TOKEN", ""),
+
   getModel(): string {
     const provider = Config.LLM_PROVIDER;
     if (provider === "groq") return Config.GROQ_MODEL;
     if (provider === "bedrock") return Config.BEDROCK_MODEL;
     if (provider === "openrouter") return Config.OPENROUTER_MODEL;
     if (provider === "ollama") return Config.OLLAMA_MODEL;
+    if (provider === "duck-cli") return Config.DUCK_CLI_MODEL;
     return Config.OPENAI_MODEL;
   },
 
   validate(): void {
     const provider = Config.LLM_PROVIDER;
+    // duck-cli uses env vars for all providers, no extra validation needed
+    if (provider === "duck-cli") return;
     if (provider === "groq" && !Config.GROQ_API_KEY) {
       throw new Error("GROQ_API_KEY is required when using Groq provider");
     }

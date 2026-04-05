@@ -655,6 +655,11 @@ export function getLlmProvider(): LLMProvider {
   if (Config.LLM_PROVIDER === "openrouter") {
     return new OpenRouterProvider();
   }
+  if (Config.LLM_PROVIDER === "duck-cli") {
+    // Lazy import to avoid circular deps
+    const { DuckCLIProvider } = require("./providers/duck-cli.js");
+    return new DuckCLIProvider();
+  }
   // OpenAI, Groq, and Ollama all use OpenAI-compatible API
   return new OpenAIProvider();
 }
