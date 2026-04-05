@@ -502,3 +502,68 @@ built by [unitedby.ai](https://unitedby.ai) — an open ai community
 ## license
 
 mit
+
+---
+
+## 🦆 duck-cli Integration (Fork by Franzferdinan51)
+
+This fork of DroidClaw adds **duck-cli provider integration** — routing LLM calls through duck-cli's multi-provider system for access to Duckets' full model stack.
+
+### Architecture
+
+```
+DroidClaw (perceive→reason→act)
+    ↓
+duck-cli Provider (LLM_PROVIDER=duck-cli)
+    ↓
+duck-cli's ProviderManager
+    ├→ LM Studio (Gemma 4 e4b/26b) — LOCAL, FREE, Android-trained!
+    ├→ Kimi k2.5 — Vision + coding
+    ├→ MiniMax M2.7 — Fast reasoning
+    └→ OpenRouter — Free tier
+```
+
+### Quick Start
+
+```bash
+# Clone this fork
+git clone https://github.com/Franzferdinan51/droidclaw.git
+cd droidclaw
+
+# Install dependencies
+bun install
+
+# Configure (copy and edit)
+cp .env.example .env
+
+# Run with Gemma 4 e4b (Android specialist — vision + tool-calling trained!)
+echo "DUCK_CLI_MODEL=gemma-4-e4b-it" >> .env
+echo "DUCK_PRIORITY=lmstudio,kimi,minimax,openrouter" >> .env
+echo "LMSTUDIO_URL=http://localhost:1234" >> .env
+
+# Launch!
+bun run src/kernel.ts
+```
+
+### Model Selection
+
+| Model | Provider | Best For |
+|-------|----------|----------|
+| `gemma-4-e4b-it` | LM Studio | **Android PREFERRED** — trained on Android Studio Agent Mode + vision + tool-calling |
+| `google/gemma-4-26b-a4b` | LM Studio | Large Gemma 4, highest quality |
+| `kimi-k2.5` | Kimi | Vision + coding |
+| `minimax/MiniMax-M2.7` | MiniMax | Fast reasoning (~2s) |
+| `minimax/minimax-m2.5:free` | OpenRouter | Free tier |
+
+### Key Finding
+
+**Gemma 4 e4b via LM Studio is the best model for Android control** — it's specifically trained on Android Studio Agent Mode and has native vision + tool-calling. It correctly reasoned "open settings" → tap Settings icon in one step.
+
+See [DUCK_CLI_PROVIDER.md](./DUCK_CLI_PROVIDER.md) for full documentation.
+
+### Why This Fork?
+
+- ✅ Access to Duckets' full model stack (6 providers)
+- ✅ Gemma 4 e4b for Android-specific reasoning
+- ✅ Local inference via LM Studio (free, fast fallback)
+- ✅ duck-cli android agent command for Go-binary deployment
